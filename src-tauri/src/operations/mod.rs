@@ -1,103 +1,9 @@
-use std::fmt::Debug;
-
-use crate::generic_error::ParsingTokenError;
-
-pub enum Token {
-    None,
-    Integer(String),
-    Float(String),
-    Operation(char),
-    ParenthesisOpen,
-    ParenthesisClose,
-}
-
-impl Debug for Token {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                Self::None => "None".to_string(),
-                Self::Integer(i) => format!("Integer({})", i),
-                Self::Float(i) => format!("Float({})", i),
-                Self::Operation(i) => format!("Operation({})", i),
-                Self::ParenthesisClose => "ParenthesisClose".to_string(),
-                Self::ParenthesisOpen => "ParenthesisOpen".to_string(),
-            }
-        )
-    }
-}
-
-impl Token {
-    fn new(c: char) -> Token {
-        match c {
-            '0'..='9' => Self::Integer(c.to_string()),
-            '+' | '*' | '/' | '-' => Self::Operation(c),
-            '.' => Self::Float(String::from(".")),
-            '(' => Self::ParenthesisOpen,
-            ')' => Self::ParenthesisClose,
-            _ => Self::None,
-        }
-    }
-
-    fn in_none(&self) -> bool {
-        matches!(*self, Self::None)
-    }
-
-    fn digest(self, c: char) -> Result<(Self, Option<Self>), ParsingTokenError> {
-        let other = Token::new(c);
-
-        if other.in_none() {
-            return Err(ParsingTokenError::InvalidToken);
-        }
-
-        match (&self, &other) {
-            (Self::None, _) => Ok((other, None)),
-            (Self::Integer(n), Self::Integer(o)) => {
-                Ok((Self::Integer(format!("{}{}", n, o).to_string()), None))
-            }
-            (Self::Float(n), Self::Integer(o)) => {
-                Ok((Self::Float(format!("{}{}", n, o).to_string()), None))
-            }
-
-            (Self::Integer(n), Self::Float(f)) => {
-                Ok((Self::Float(format!("{}{}", n, f).to_string()), None))
-            }
-            (Self::Float(_), Self::Float(_)) => Err(ParsingTokenError::TooManyDots),
-            _ => Ok((self, Some(other))),
-        }
-    }
-}
-
-pub struct Tokenizable(Vec<Token>);
-
-impl Tokenizable {
-    pub fn new(s: &str) -> Result<Tokenizable, ParsingTokenError> {
-        let mut result = vec![];
-        let mut current_token = Token::None;
-        for c in s.chars() {
-            current_token = match current_token.digest(c) {
-                // If a token failed, the whole thing fails
-                Err(e) => return Err(e),
-                // If it yielded 2 tokens, the previous one can be "committed"
-                Ok((old, Some(new))) => {
-                    result.push(old);
-                    new
-                }
-                // The old token was edited
-                Ok((old, None)) => old,
-            };
-        }
-
-        if !current_token.in_none() {
-            result.push(current_token);
-        }
-
-        Ok(Tokenizable(result))
-    }
-}
+pub(crate) mod token;
+pub(crate) mod token_set;
+pub(crate) mod token_tree;
 
 mod tests {
+    use crate::operations::token::Token;
 
     #[test]
     fn test_invalid_floats() {
@@ -105,7 +11,7 @@ mod tests {
 
         tokens
             .into_iter()
-            .map(super::Tokenizable::new)
+            .map(super::token_set::TokenSet::new)
             .for_each(|res| {
                 let err = res.err().unwrap();
                 assert_eq!(err, crate::generic_error::ParsingTokenError::TooManyDots);
@@ -117,7 +23,7 @@ mod tests {
 
         tokens
             .into_iter()
-            .map(super::Tokenizable::new)
+            .map(super::token_set::TokenSet::new)
             .for_each(|res| {
                 let err = res.err().unwrap();
                 assert_eq!(err, crate::generic_error::ParsingTokenError::InvalidToken);
@@ -130,12 +36,47 @@ mod tests {
 
         tokens
             .into_iter()
-            .map(super::Tokenizable::new)
+            .map(super::token_set::TokenSet::new)
             .for_each(|res| {
                 assert!(res.is_ok());
                 res.unwrap().0.into_iter().for_each(|token| {
-                    assert!(format!("{:?}", token).contains("Float"));
+                    assert!(matches!(token, super::token::Token::Float { .. }));
                 })
             });
+    }
+
+    #[test]
+    fn test_example_token() {
+        let s = "7+12-3+1.1";
+
+        let as_tokens = super::token_set::TokenSet::new(s);
+        assert!(as_tokens.is_ok());
+
+        let tokens = as_tokens.unwrap();
+        assert_eq!(tokens.0.len(), 7);
+
+        assert!(matches!(tokens.0[0], Token::Integer { .. }));
+        assert!(matches!(tokens.0[1], Token::Operation { .. }));
+        assert!(matches!(tokens.0[2], Token::Integer { .. }));
+        assert!(matches!(tokens.0[3], Token::Operation { .. }));
+        assert!(matches!(tokens.0[4], Token::Integer { .. }));
+        assert!(matches!(tokens.0[5], Token::Operation { .. }));
+        assert!(matches!(tokens.0[6], Token::Float { .. }));
+    }
+
+    #[test]
+    fn test_evaluate_example_token() {
+        let s = "7+12-3+1.1";
+
+        let as_tokens = super::token_set::TokenSet::new(s);
+        println!("{:?}", as_tokens);
+        assert!(as_tokens.is_ok());
+
+        let tokens = as_tokens.unwrap();
+        let tree = tokens.validate().unwrap().split();
+
+        let solution = tree.solve();
+
+        assert_eq!(solution, 17.1)
     }
 }

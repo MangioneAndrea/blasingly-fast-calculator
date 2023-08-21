@@ -4,6 +4,9 @@ use std::{error::Error, fmt};
 pub enum ParsingTokenError {
     TooManyDots,
     InvalidToken,
+    ParenthesisClosedWithoutOpening,
+    ParenthesisOpenedWithoutClosing,
+    InvalidSequence,
 }
 
 impl Error for ParsingTokenError {
@@ -19,6 +22,13 @@ impl ParsingTokenError {
                 "Too many dots in a float. A float can have only 1 dot"
             }
             ParsingTokenError::InvalidToken => "Invalid token given",
+            ParsingTokenError::ParenthesisClosedWithoutOpening => {
+                "Encountered ')' without respective opening"
+            }
+            ParsingTokenError::InvalidSequence => "Encountered invalid sequence",
+            ParsingTokenError::ParenthesisOpenedWithoutClosing => {
+                "Encountered '(' without respective closing"
+            }
         }
     }
 }

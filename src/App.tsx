@@ -1,4 +1,4 @@
-import { createResource, createSignal, lazy, onCleanup } from 'solid-js';
+import { createResource, createSignal} from 'solid-js';
 import { invoke } from '@tauri-apps/api/tauri';
 import './App.css';
 interface ButtonProps {
