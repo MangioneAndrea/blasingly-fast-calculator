@@ -2,22 +2,25 @@ use std::fmt::Debug;
 
 use crate::generic_error::ParsingTokenError;
 
+use super::Executable;
+
 #[derive(PartialEq, Clone, Debug)]
 pub enum Token {
     None,
     Integer(String),
     Float(String),
-    Operation(char),
+    Operation(Executable),
     ParenthesisOpen,
     ParenthesisClose,
 }
-
 
 impl Token {
     fn new(c: char) -> Token {
         match c {
             '0'..='9' => Self::Integer(c.to_string()),
-            '+' | '*' | '/' | '-' => Self::Operation(c),
+            '+' | '*' | '/' | '-' => {
+                Executable::try_from(c).map_or(Self::None, |o| Self::Operation(o))
+            }
             '.' => Self::Float(String::from(".")),
             '(' => Self::ParenthesisOpen,
             ')' => Self::ParenthesisClose,
@@ -27,10 +30,10 @@ impl Token {
 
     pub fn get_grade(&self, parenthesis: usize) -> Option<usize> {
         match self {
-            Token::Operation('*') => Some(1 * parenthesis * 1_000_000),
-            Token::Operation('/') => Some(1 * parenthesis * 1_000_000),
-            Token::Operation('+') => Some(0 * parenthesis * 1_000_000),
-            Token::Operation('-') => Some(0 * parenthesis * 1_000_000),
+            Token::Operation(Executable::Mul) => Some(1 + parenthesis * 1_000_000),
+            Token::Operation(Executable::Div) => Some(1 + parenthesis * 1_000_000),
+            Token::Operation(Executable::Sum) => Some(0 + parenthesis * 1_000_000),
+            Token::Operation(Executable::Sub) => Some(0 + parenthesis * 1_000_000),
             _ => None,
         }
     }
@@ -38,7 +41,6 @@ impl Token {
     pub fn can_be_followed_by(&self, other: &Token) -> bool {
         match (self, other) {
             (_, Self::None) => false,
-            (Self::None, _) => false,
             (Self::Operation(_), Self::Operation(_)) => false,
             (Self::Operation(_), Self::ParenthesisClose) => false,
             (Self::Float(_), Self::ParenthesisOpen) => false,

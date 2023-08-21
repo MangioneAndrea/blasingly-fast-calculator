@@ -86,6 +86,7 @@ impl TokenSet<Valid> {
 
     // First, search for + and - from right to left. What's in parenthesis has to be done last
     pub fn split(self) -> TokenTree {
+        println!("{:?}",self.0);
         if self.0.len() == 1 {
             return TokenTree::Single(self.0[0].clone());
         }
@@ -104,7 +105,7 @@ impl TokenSet<Valid> {
 
         let mut lowest_grade = usize::MAX;
         let mut lowest_grade_index = 0;
-        for index in self.0.len()..=0 {
+        for index in (0..self.0.len()).rev() {
             match self.0[index] {
                 Token::ParenthesisClose => {
                     parenthesis += 1;
@@ -117,10 +118,11 @@ impl TokenSet<Valid> {
                     if let Some(g) = grade {
                         if g < lowest_grade {
                             lowest_grade_index = index;
+                            lowest_grade = g;
                         }
                     }
                 }
-            }
+            };
         }
 
         //       Vec::from_iter(self.0[0..lowest_grade_index].iter().cloned()),
@@ -135,7 +137,7 @@ impl TokenSet<Valid> {
             self.0[lowest_grade_index].clone(),
             Box::new(
                 TokenSet(
-                    Vec::from_iter(self.0[0..lowest_grade_index].iter().cloned()),
+                    Vec::from_iter(self.0[lowest_grade_index + 1..self.0.len()].iter().cloned()),
                     std::marker::PhantomData::<Valid>,
                 )
                 .split(),

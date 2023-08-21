@@ -1,5 +1,7 @@
 use std::{error::Error, fmt};
 
+use crate::operations::token::Token;
+
 #[derive(Debug, PartialEq)]
 pub enum ParsingTokenError {
     TooManyDots,
@@ -7,6 +9,7 @@ pub enum ParsingTokenError {
     ParenthesisClosedWithoutOpening,
     ParenthesisOpenedWithoutClosing,
     InvalidSequence,
+    OperationNotImplemented,
 }
 
 impl Error for ParsingTokenError {
@@ -29,6 +32,7 @@ impl ParsingTokenError {
             ParsingTokenError::ParenthesisOpenedWithoutClosing => {
                 "Encountered '(' without respective closing"
             }
+            ParsingTokenError::OperationNotImplemented => "Operation is not implemented",
         }
     }
 }
