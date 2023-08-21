@@ -1,53 +1,85 @@
-import { createSignal } from "solid-js";
-import logo from "./assets/logo.svg";
-import { invoke } from "@tauri-apps/api/tauri";
-import "./App.css";
+import { createResource, createSignal, lazy, onCleanup } from 'solid-js';
+import { invoke } from '@tauri-apps/api/tauri';
+import './App.css';
+interface ButtonProps {
+    label: string;
+    onClick: () => void;
+}
 
+const Button = (props: ButtonProps) => {
+    return (
+        <button
+            onClick={props.onClick}
+            class="col-span-1 p-4 border rounded-md text-white bg-gray-600 hover:bg-gray-500 focus:outline-none"
+        >
+            {props.label}
+        </button>
+    );
+};
 function App() {
-  const [greetMsg, setGreetMsg] = createSignal("");
-  const [name, setName] = createSignal("");
+    const [inputValue, setInputValue] = createSignal('');
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name: name() }));
-  }
+    const buttonLabels = [
+        '7',
+        '8',
+        '9',
+        '/',
+        '4',
+        '5',
+        '6',
+        '*',
+        '1',
+        '2',
+        '3',
+        '-',
+        '0',
+        '.',
+        '+',
+        '=',
+        '√',
+        'x²',
+        'sin',
+        'cos', // Add more labels as needed
+    ];
 
-  return (
-    <div class="container">
-      <h1>Welcome to Tauri!</h1>
+    async function calculate(): Promise<string> {
+        return invoke('calculate', { input: inputValue() });
+    }
 
-      <div class="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://solidjs.com" target="_blank">
-          <img src={logo} class="logo solid" alt="Solid logo" />
-        </a>
-      </div>
+    const handleButtonClick = async (label: string) => {
+        if (label === '=') {
+            setInputValue(await calculate());
+        } else {
+            setInputValue((prevValue) => prevValue + label);
+        }
+    };
 
-      <p>Click on the Tauri, Vite, and Solid logos to learn more.</p>
-
-      <form
-        class="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-
-      <p>{greetMsg()}</p>
-    </div>
-  );
+    const [result] = createResource(inputValue, calculate);
+    return (
+        <div class="bg-gray-900 h-screen flex items-center justify-center">
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 w-96">
+                <div class="relative">
+                    <input
+                        type="text"
+                        class="w-full h-16 p-2 pt-1 border bg-gray-700 rounded-md text-white mb-2"
+                        value={inputValue()}
+                        disabled
+                    />
+                    <div class="absolute bottom-2 right-2 text-gray-500">
+                        {result()}
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-4 mt-4">
+                    {buttonLabels.map((label) => (
+                        <Button
+                            label={label}
+                            onClick={() => handleButtonClick(label)}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default App;
