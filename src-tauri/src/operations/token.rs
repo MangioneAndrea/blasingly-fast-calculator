@@ -33,13 +33,15 @@ impl Token {
         binary.or(unary).ok()
     }
 
+    // https://en.wikipedia.org/wiki/Order_of_operations
     pub fn get_grade(&self, parenthesis: usize) -> Option<usize> {
         match self {
             Token::BinaryOperation(BinaryOp::Sum) => Some(1 + parenthesis * 1_000_000),
             Token::BinaryOperation(BinaryOp::Sub) => Some(1 + parenthesis * 1_000_000),
             Token::BinaryOperation(BinaryOp::Mul) => Some(2 + parenthesis * 1_000_000),
             Token::BinaryOperation(BinaryOp::Div) => Some(2 + parenthesis * 1_000_000),
-            Token::UnaryOperation(_) => Some(3 + parenthesis * 1_000_000),
+            Token::BinaryOperation(_) => Some(3 + parenthesis * 1_000_000),
+            Token::UnaryOperation(_) => Some(4 + parenthesis * 1_000_000),
             _ => None,
         }
     }
@@ -61,6 +63,8 @@ impl Token {
         matches!(*self, Self::None)
     }
 
+    /// Add char to token. If the character cannot be digested, then the previous token is closed
+    /// and a new one is also returned
     pub fn digest(self, c: char) -> Result<(Self, Option<Self>), ParsingTokenError> {
         let other = Token::new(c);
 

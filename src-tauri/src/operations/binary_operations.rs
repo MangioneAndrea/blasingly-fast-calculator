@@ -6,6 +6,7 @@ pub enum BinaryOp {
     Sub,
     Mul,
     Div,
+    Pow,
 }
 
 impl BinaryOp {
@@ -15,6 +16,7 @@ impl BinaryOp {
             Self::Sub => a - b,
             Self::Mul => a * b,
             Self::Div => a / b,
+            Self::Pow => a.powf(b),
         }
     }
 }
@@ -28,6 +30,7 @@ impl TryFrom<&str> for BinaryOp {
             "-" => Ok(Self::Sub),
             "*" => Ok(Self::Mul),
             "/" => Ok(Self::Div),
+            "^" => Ok(Self::Pow),
             _ => Err(ParsingTokenError::OperationNotImplemented),
         }
     }

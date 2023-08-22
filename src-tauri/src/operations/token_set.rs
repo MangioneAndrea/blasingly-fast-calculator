@@ -85,7 +85,9 @@ impl TokenSet<Valid> {
      */
 
     // First, search for + and - from right to left. What's in parenthesis has to be done last
+    // The alg for the priority is in the function get_grade
     pub fn split(self) -> TokenTree {
+        // println!("{:?}", self.0); // This is the main debug thing in case stuff doesn't work
         if self.0.is_empty() {
             return TokenTree::Single(Token::Integer(String::from("0")));
         }

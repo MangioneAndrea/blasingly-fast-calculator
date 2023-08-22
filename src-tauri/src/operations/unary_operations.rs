@@ -6,6 +6,7 @@ pub enum UnaryOp {
     Cos,
     Acos,
     Sin,
+    Log10
 }
 
 impl UnaryOp {
@@ -15,6 +16,7 @@ impl UnaryOp {
             Self::Cos => a.cos(),
             Self::Acos => a.acos(),
             Self::Sin => a.sin(),
+            Self::Log10 => a.log10(),
         }
     }
 }
@@ -28,6 +30,7 @@ impl TryFrom<&str> for UnaryOp {
             "cos" => Ok(Self::Cos),
             "acos" => Ok(Self::Acos),
             "sin" => Ok(Self::Sin),
+            "log" => Ok(Self::Log10),
             _ => Err(ParsingTokenError::OperationNotImplemented),
         }
     }
