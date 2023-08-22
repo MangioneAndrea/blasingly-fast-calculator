@@ -1,4 +1,4 @@
-# Blasingly fast calculator
+# Blazingly fast calculator
 
 Yes, it's just a calculator. No, it's not as easy as you think
 
