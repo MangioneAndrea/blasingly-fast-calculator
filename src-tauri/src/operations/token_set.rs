@@ -86,7 +86,6 @@ impl TokenSet<Valid> {
 
     // First, search for + and - from right to left. What's in parenthesis has to be done last
     pub fn split(self) -> TokenTree {
-        println!("{:?}", self.0);
         if self.0.len() == 0 {
             return TokenTree::Single(Token::Integer(String::from("0")));
         }

@@ -63,7 +63,7 @@ function App() {
                         type="text"
                         class="w-full h-16 p-2 pt-1 border bg-gray-700 rounded-md text-white mb-2"
                         value={inputValue()}
-			onChange={(e)=>setInputValue(e.target.value)}
+			onInput={(e)=>setInputValue(e.target.value)}
                     />
                     <div class="absolute bottom-2 right-2 text-gray-500">
                         {result()}

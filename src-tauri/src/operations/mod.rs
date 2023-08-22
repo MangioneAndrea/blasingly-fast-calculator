@@ -1,13 +1,13 @@
 use crate::generic_error::ParsingTokenError;
 
 pub(crate) mod binary_operations;
-pub(crate) mod unary_operations;
 pub(crate) mod token;
 pub(crate) mod token_set;
 pub(crate) mod token_tree;
+pub(crate) mod unary_operations;
 
 pub fn parse_string(input: &str) -> Result<f32, ParsingTokenError> {
-    let set = token_set::TokenSet::new(input)?;
+    let set = token_set::TokenSet::new(input.replace(" ", "").as_str())?;
     let valid = set.validate()?;
     let tree = valid.split();
 
