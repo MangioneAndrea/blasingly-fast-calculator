@@ -1,6 +1,6 @@
 use std::{error::Error, fmt};
 
-use crate::operations::token::Token;
+
 
 #[derive(Debug, PartialEq)]
 pub enum ParsingTokenError {
@@ -16,7 +16,7 @@ pub enum ParsingTokenError {
 
 impl Error for ParsingTokenError {
     fn description(&self) -> &str {
-        &self.__description()
+        self.__description()
     }
 }
 

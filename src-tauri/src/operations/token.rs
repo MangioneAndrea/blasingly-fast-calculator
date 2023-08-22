@@ -27,8 +27,8 @@ impl Token {
     }
 
     fn operation_from_str(s: impl AsRef<str>) -> Option<Token> {
-        let binary = BinaryOp::try_from(s.as_ref()).map(|o| Self::BinaryOperation(o));
-        let unary = UnaryOp::try_from(s.as_ref()).map(|o| Self::UnaryOperation(o));
+        let binary = BinaryOp::try_from(s.as_ref()).map(Self::BinaryOperation);
+        let unary = UnaryOp::try_from(s.as_ref()).map(Self::UnaryOperation);
 
         binary.or(unary).ok()
     }
@@ -79,14 +79,14 @@ impl Token {
             } //Ok((other, None)),
             (Self::Incomplete(_), _) => Err(ParsingTokenError::UnknownOperation),
             (Self::Integer(n), Self::Integer(o)) => {
-                Ok((Self::Integer(format!("{}{}", n, o).to_string()), None))
+                Ok((Self::Integer(format!("{}{}", n, o)), None))
             }
             (Self::Float(n), Self::Integer(o)) => {
-                Ok((Self::Float(format!("{}{}", n, o).to_string()), None))
+                Ok((Self::Float(format!("{}{}", n, o)), None))
             }
 
             (Self::Integer(n), Self::Float(f)) => {
-                Ok((Self::Float(format!("{}{}", n, f).to_string()), None))
+                Ok((Self::Float(format!("{}{}", n, f)), None))
             }
             (Self::Float(_), Self::Float(_)) => Err(ParsingTokenError::TooManyDots),
             _ => Ok((self, Some(other))),

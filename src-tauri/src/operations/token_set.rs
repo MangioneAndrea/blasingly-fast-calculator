@@ -41,7 +41,7 @@ impl TokenSet<Invalid> {
         let mut previous_token: &Token = &Token::None;
 
         for token in &self.0 {
-            if !previous_token.can_be_followed_by(&token) {
+            if !previous_token.can_be_followed_by(token) {
                 return Err(ParsingTokenError::InvalidSequence);
             }
 
@@ -54,7 +54,7 @@ impl TokenSet<Invalid> {
             if parenthesis_opened < 0 {
                 return Err(ParsingTokenError::ParenthesisClosedWithoutOpening);
             }
-            previous_token = &token;
+            previous_token = token;
         }
 
         if parenthesis_opened != 0 {
@@ -86,7 +86,7 @@ impl TokenSet<Valid> {
 
     // First, search for + and - from right to left. What's in parenthesis has to be done last
     pub fn split(self) -> TokenTree {
-        if self.0.len() == 0 {
+        if self.0.is_empty() {
             return TokenTree::Single(Token::Integer(String::from("0")));
         }
         if self.0.len() == 1 {
