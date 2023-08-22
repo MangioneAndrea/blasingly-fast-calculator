@@ -37,6 +37,14 @@ impl TryFrom<char> for Executable {
     }
 }
 
+pub fn parse_string(input: &str) -> Result<f32, ParsingTokenError> {
+    let set = token_set::TokenSet::new(input)?;
+    let valid = set.validate()?;
+    let tree = valid.split();
+
+    Ok(tree.solve())
+}
+
 mod tests {
     use crate::operations::token::Token;
 

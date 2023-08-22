@@ -10,6 +10,7 @@ pub enum ParsingTokenError {
     ParenthesisOpenedWithoutClosing,
     InvalidSequence,
     OperationNotImplemented,
+    Empty,
 }
 
 impl Error for ParsingTokenError {
@@ -32,6 +33,7 @@ impl ParsingTokenError {
             ParsingTokenError::ParenthesisOpenedWithoutClosing => {
                 "Encountered '(' without respective closing"
             }
+            ParsingTokenError::Empty => "",
             ParsingTokenError::OperationNotImplemented => "Operation is not implemented",
         }
     }

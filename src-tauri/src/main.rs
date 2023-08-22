@@ -7,8 +7,9 @@ pub(crate) mod operations;
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 fn calculate(input: &str) -> String {
-    operations::token_set::TokenSet::new(input);
-    format!("{}", input)
+    let res = operations::parse_string(input);
+
+    res.map_or_else(|e| format!("{:?}", e), |r| format!("{}", r))
 }
 
 fn main() {

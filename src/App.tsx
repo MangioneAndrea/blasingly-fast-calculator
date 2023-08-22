@@ -38,8 +38,8 @@ function App() {
         '=',
         '√',
         'x²',
-        'sin',
-        'cos', // Add more labels as needed
+        '(',
+        ')', 
     ];
 
     async function calculate(): Promise<string> {
@@ -56,14 +56,13 @@ function App() {
 
     const [result] = createResource(inputValue, calculate);
     return (
-        <div class="bg-gray-900 h-screen flex items-center justify-center">
-            <div class="bg-gray-800 rounded-lg shadow-md p-6 w-96">
+        <div class="bg-gray-900 h-screen flex items-center justify-center w-screen">
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 w-screen h-screen">
                 <div class="relative">
                     <input
                         type="text"
                         class="w-full h-16 p-2 pt-1 border bg-gray-700 rounded-md text-white mb-2"
                         value={inputValue()}
-                        disabled
                     />
                     <div class="absolute bottom-2 right-2 text-gray-500">
                         {result()}

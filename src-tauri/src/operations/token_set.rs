@@ -61,6 +61,10 @@ impl TokenSet<Invalid> {
             return Err(ParsingTokenError::ParenthesisOpenedWithoutClosing);
         }
 
+        if self.0.len() % 2 == 0 {
+            return Err(ParsingTokenError::Empty);
+        }
+
         Ok(TokenSet(self.0, std::marker::PhantomData::<Valid>))
     }
 }
@@ -86,7 +90,6 @@ impl TokenSet<Valid> {
 
     // First, search for + and - from right to left. What's in parenthesis has to be done last
     pub fn split(self) -> TokenTree {
-        println!("{:?}",self.0);
         if self.0.len() == 1 {
             return TokenTree::Single(self.0[0].clone());
         }
