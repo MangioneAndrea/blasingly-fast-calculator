@@ -2,7 +2,7 @@
 
 Yes, it's just a calculator. No, it's not as easy as you think
 
- <img src="/public/screenshot.png" alt="screenshot" style="height: 100px; width:100px;"/>
+ <img src="/public/screenshot.png" alt="screenshot" style="max-width:400px;"/>
 
 
 ## Principle
