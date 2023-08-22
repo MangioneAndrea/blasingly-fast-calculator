@@ -61,10 +61,6 @@ impl TokenSet<Invalid> {
             return Err(ParsingTokenError::ParenthesisOpenedWithoutClosing);
         }
 
-        if self.0.len() % 2 == 0 {
-            return Err(ParsingTokenError::Empty);
-        }
-
         Ok(TokenSet(self.0, std::marker::PhantomData::<Valid>))
     }
 }
@@ -90,6 +86,10 @@ impl TokenSet<Valid> {
 
     // First, search for + and - from right to left. What's in parenthesis has to be done last
     pub fn split(self) -> TokenTree {
+        println!("{:?}", self.0);
+        if self.0.len() == 0 {
+            return TokenTree::Single(Token::Integer(String::from("0")));
+        }
         if self.0.len() == 1 {
             return TokenTree::Single(self.0[0].clone());
         }
@@ -126,6 +126,22 @@ impl TokenSet<Valid> {
                     }
                 }
             };
+        }
+
+        // Only unary ops can be at the beginning
+        if lowest_grade_index == 0 {
+            return TokenTree::UnaryOperation(
+                self.0[lowest_grade_index].clone(),
+                Box::new(
+                    TokenSet(
+                        Vec::from_iter(
+                            self.0[lowest_grade_index + 1..self.0.len()].iter().cloned(),
+                        ),
+                        std::marker::PhantomData::<Valid>,
+                    )
+                    .split(),
+                ),
+            );
         }
 
         return TokenTree::BinaryOperation(

@@ -11,6 +11,7 @@ pub enum ParsingTokenError {
     InvalidSequence,
     OperationNotImplemented,
     Empty,
+    UnknownOperation,
 }
 
 impl Error for ParsingTokenError {
@@ -35,6 +36,7 @@ impl ParsingTokenError {
             }
             ParsingTokenError::Empty => "",
             ParsingTokenError::OperationNotImplemented => "Operation is not implemented",
+            ParsingTokenError::UnknownOperation => "Operation not known",
         }
     }
 }

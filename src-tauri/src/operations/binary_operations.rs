@@ -19,15 +19,15 @@ impl BinaryOp {
     }
 }
 
-impl TryFrom<char> for BinaryOp {
+impl TryFrom<&str> for BinaryOp {
     type Error = ParsingTokenError;
 
-    fn try_from(value: char) -> Result<Self, Self::Error> {
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
-            '+' => Ok(Self::Sum),
-            '-' => Ok(Self::Sub),
-            '*' => Ok(Self::Mul),
-            '/' => Ok(Self::Div),
+            "+" => Ok(Self::Sum),
+            "-" => Ok(Self::Sub),
+            "*" => Ok(Self::Mul),
+            "/" => Ok(Self::Div),
             _ => Err(ParsingTokenError::OperationNotImplemented),
         }
     }

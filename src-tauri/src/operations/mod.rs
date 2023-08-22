@@ -1,6 +1,7 @@
 use crate::generic_error::ParsingTokenError;
 
 pub(crate) mod binary_operations;
+pub(crate) mod unary_operations;
 pub(crate) mod token;
 pub(crate) mod token_set;
 pub(crate) mod token_tree;
