@@ -22,7 +22,7 @@ impl Token {
             '.' => Self::Float(String::from(".")),
             '(' => Self::ParenthesisOpen,
             ')' => Self::ParenthesisClose,
-            _ => Self::operation_from_str(c.to_string()).unwrap_or(Self::Incomplete(c.to_string())),
+            _ => Self::Incomplete(c.to_string()), // Self::operation_from_str(c.to_string()).unwrap_or(Self::Incomplete(c.to_string())),
         }
     }
 
@@ -69,26 +69,26 @@ impl Token {
         }
 
         match (&self, &other) {
-            (Self::None, _) => Ok((other, None)),
             (Self::Incomplete(a), Self::Incomplete(b)) => {
-                let comb = format!("{}{}", a, b);
-                Ok((
-                    Token::operation_from_str(&comb).unwrap_or(Self::Incomplete(comb)),
-                    None,
-                ))
-            } //Ok((other, None)),
-            (Self::Incomplete(_), _) => Err(ParsingTokenError::UnknownOperation),
+                Ok((Self::Incomplete(format!("{}{}", a, b)), None))
+            }
+            (Self::Incomplete(s), Self::Integer(o)) if s == &String::from("-") => {
+                Ok((Self::Integer(format!("-{}", o)), None))
+            }
+            (Self::Incomplete(s), Self::Float(o)) if s == &String::from("-") => {
+                Ok((Self::Float(format!("-{}", o)), None))
+            }
             (Self::Integer(n), Self::Integer(o)) => {
                 Ok((Self::Integer(format!("{}{}", n, o)), None))
             }
-            (Self::Float(n), Self::Integer(o)) => {
-                Ok((Self::Float(format!("{}{}", n, o)), None))
-            }
+            (Self::Float(n), Self::Integer(o)) => Ok((Self::Float(format!("{}{}", n, o)), None)),
 
-            (Self::Integer(n), Self::Float(f)) => {
-                Ok((Self::Float(format!("{}{}", n, f)), None))
-            }
+            (Self::Integer(n), Self::Float(f)) => Ok((Self::Float(format!("{}{}", n, f)), None)),
             (Self::Float(_), Self::Float(_)) => Err(ParsingTokenError::TooManyDots),
+            (Self::Incomplete(s), _) => Token::operation_from_str(s)
+                .map(|s| (s, Some(other)))
+                .ok_or(ParsingTokenError::UnknownOperation),
+            (Self::None, _) => Ok((other, None)),
             _ => Ok((self, Some(other))),
         }
     }
