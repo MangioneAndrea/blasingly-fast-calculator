@@ -1,15 +1,14 @@
 use std::fmt::Debug;
 
+use super::binary_operations::BinaryOp;
 use crate::generic_error::ParsingTokenError;
-
-use super::Executable;
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum Token {
     None,
     Integer(String),
     Float(String),
-    Operation(Executable),
+    BinaryOperation(BinaryOp),
     ParenthesisOpen,
     ParenthesisClose,
 }
@@ -19,7 +18,7 @@ impl Token {
         match c {
             '0'..='9' => Self::Integer(c.to_string()),
             '+' | '*' | '/' | '-' => {
-                Executable::try_from(c).map_or(Self::None, |o| Self::Operation(o))
+                BinaryOp::try_from(c).map_or(Self::None, |o| Self::BinaryOperation(o))
             }
             '.' => Self::Float(String::from(".")),
             '(' => Self::ParenthesisOpen,
@@ -30,10 +29,10 @@ impl Token {
 
     pub fn get_grade(&self, parenthesis: usize) -> Option<usize> {
         match self {
-            Token::Operation(Executable::Mul) => Some(1 + parenthesis * 1_000_000),
-            Token::Operation(Executable::Div) => Some(1 + parenthesis * 1_000_000),
-            Token::Operation(Executable::Sum) => Some(0 + parenthesis * 1_000_000),
-            Token::Operation(Executable::Sub) => Some(0 + parenthesis * 1_000_000),
+            Token::BinaryOperation(BinaryOp::Mul) => Some(1 + parenthesis * 1_000_000),
+            Token::BinaryOperation(BinaryOp::Div) => Some(1 + parenthesis * 1_000_000),
+            Token::BinaryOperation(BinaryOp::Sum) => Some(0 + parenthesis * 1_000_000),
+            Token::BinaryOperation(BinaryOp::Sub) => Some(0 + parenthesis * 1_000_000),
             _ => None,
         }
     }
@@ -41,8 +40,8 @@ impl Token {
     pub fn can_be_followed_by(&self, other: &Token) -> bool {
         match (self, other) {
             (_, Self::None) => false,
-            (Self::Operation(_), Self::Operation(_)) => false,
-            (Self::Operation(_), Self::ParenthesisClose) => false,
+            (Self::BinaryOperation(_), Self::BinaryOperation(_)) => false,
+            (Self::BinaryOperation(_), Self::ParenthesisClose) => false,
             (Self::Float(_), Self::ParenthesisOpen) => false,
             (Self::Integer(_), Self::ParenthesisOpen) => false,
             _ => true,

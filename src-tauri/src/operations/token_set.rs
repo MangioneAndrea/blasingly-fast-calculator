@@ -128,8 +128,7 @@ impl TokenSet<Valid> {
             };
         }
 
-        //       Vec::from_iter(self.0[0..lowest_grade_index].iter().cloned()),
-        return TokenTree::Operation(
+        return TokenTree::BinaryOperation(
             Box::new(
                 TokenSet(
                     Vec::from_iter(self.0[0..lowest_grade_index].iter().cloned()),

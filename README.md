@@ -11,7 +11,7 @@ The given string is parsed as set of tokens. A token might be a number, an opera
 
 Given the properties and meaning of all tokens, it is possible to see if the given set is valid. If so, the calculation can be done.
 
-If you think `what the hell are you talking about...`, maybe the following representation might be helpful
+If you think *what the hell are you talking about...*, maybe the following representation might be helpful
 
 ```
      7 + ( 9 - 2 ) * 7 + 3 * 4
@@ -46,6 +46,5 @@ This project is powered by [tauri](https://tauri.app/). Also it's setup with sol
     1. What's the fun in that...
     2. It [should never be used](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#never_use_eval!) anyway
     3. Any operation can be implemented. Its completelly independent from js
-        - E.g. you can use`√` instead of `Math.sqrt(..)`, The user needn't be a developer to use the calculator!
-        - E.g. you can implement `|-1|` for absolute values whatsoever
-
+        - E.g. you can use `√` instead of `Math.sqrt(..)`, The user needn't be a developer to use the calculator!
+        - E.g. you can implement `|-1|` to yield 1
